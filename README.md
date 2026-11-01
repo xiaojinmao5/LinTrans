@@ -54,19 +54,6 @@
 
 ---
 
-## 🖼️ 界面预览
-
-> 将截图放到仓库的 `docs/screenshots/` 目录后，替换下面的路径即可。
-
-| 文件管理 | 局域网剪贴板 |
-| :---: | :---: |
-| ![文件列表](docs/screenshots/files-light.png) | ![共享文本](docs/screenshots/clipboard.png) |
-
-| 二维码访问 | 深色模式 |
-| :---: | :---: |
-| ![二维码](docs/screenshots/qrcode.png) | ![深色模式](docs/screenshots/files-dark.png) |
-
----
 
 ## 🧱 技术栈
 
