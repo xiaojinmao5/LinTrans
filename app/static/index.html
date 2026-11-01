@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<title>局域网共享</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="12" rx="2"></rect>
+          <path d="M8 20h8M12 16v4"></path>
+          <path d="M8 9.5h.01M8 12.5h.01M11 9.5h5M11 12.5h3"></path>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1 id="appName">局域网共享</h1>
+        <p class="sub" id="hostLine">正在连接…</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="icon-btn" id="addrBtn" title="访问地址与二维码">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <path d="M4 9V5.5A1.5 1.5 0 0 1 5.5 4H9M15 4h3.5A1.5 1.5 0 0 1 20 5.5V9M20 15v3.5a1.5 1.5 0 0 1-1.5 1.5H15M9 20H5.5A1.5 1.5 0 0 1 4 18.5V15"></path>
+          <rect x="9" y="9" width="6" height="6" rx="1"></rect>
+        </svg>
+      </button>
+      <button class="icon-btn" id="themeBtn" title="切换深浅色">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-view="files">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h4l2 2.5h9A1.5 1.5 0 0 1 21 10v7.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17.5z"></path></svg>
+      文件
+    </button>
+    <button class="tab" data-view="texts">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 4h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"></path><path d="M8 9h8M8 13h8M8 17h5"></path></svg>
+      文本
+    </button>
+    <div class="tab-spacer"></div>
+    <span class="disk-info" id="diskInfo"></span>
+  </nav>
+
+  <main>
+    <section class="view" id="view-files">
+      <div class="panel">
+        <div class="toolbar">
+          <div class="pathbar">
+            <button class="ghost icon-only" id="backBtn" title="上一级" disabled>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+            </button>
+            <div class="crumbs" id="crumbs"></div>
+          </div>
+          <div class="tools">
+            <button class="primary" id="uploadBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"></path><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"></path></svg>
+              上传
+            </button>
+            <button id="mkdirBtn">新建文件夹</button>
+            <button class="ghost icon-only" id="refreshBtn" title="刷新">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"></path><path d="M20 5v6h-6"></path></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="searchbar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+          <input id="searchInput" type="search" placeholder="搜索共享目录中的文件…" autocomplete="off">
+          <button class="link-btn" id="searchClear" hidden>退出搜索</button>
+        </div>
+
+        <div class="progress" id="progress" hidden>
+          <div class="bar"><span id="progressBar"></span></div>
+          <span id="progressText">准备上传…</span>
+        </div>
+
+        <div class="list" id="fileList"></div>
+        <div class="empty" id="fileEmpty" hidden>
+          <div class="empty-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h4l2 2.5h9A1.5 1.5 0 0 1 21 10v7.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17.5z"></path></svg>
+          </div>
+          <p id="emptyText">这个文件夹还是空的</p>
+          <span class="muted">把文件拖进来，或点右上角「上传」</span>
+        </div>
+      </div>
+
+      <div class="drop-overlay" id="dropOverlay">
+        <div class="drop-inner">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"></path><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"></path></svg>
+          <p>松开即可上传到当前目录</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="view-texts" hidden>
+      <div class="panel composer">
+        <textarea id="clipInput" rows="3" maxlength="20000" placeholder="粘贴或输入要共享的文字，局域网内任何设备都能看到…"></textarea>
+        <div class="composer-actions">
+          <span class="hint" id="clipCount">0 / 20000</span>
+          <button class="primary" id="clipSend">发送</button>
+        </div>
+      </div>
+      <div class="clip-list" id="clipList"></div>
+      <div class="empty" id="clipEmpty" hidden>
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 4h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"></path><path d="M8 9h8M8 13h8M8 17h5"></path></svg>
+        </div>
+        <p>还没有共享文本</p>
+        <span class="muted">在上面输入一段文字，发送后所有设备都能复制</span>
+      </div>
+    </section>
+  </main>
+</div>
+
+<input type="file" id="filePicker" multiple hidden>
+
+<!-- 预览 -->
+<div class="modal" id="previewModal" hidden>
+  <div class="modal-card wide">
+    <div class="modal-head">
+      <h2 id="previewTitle">预览</h2>
+      <div class="modal-head-actions">
+        <a class="btn small" id="previewDownload" download>下载</a>
+        <button class="icon-btn small" id="previewClose" title="关闭">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+        </button>
+      </div>
+    </div>
+    <div class="modal-body preview-body" id="previewBody"></div>
+  </div>
+</div>
+
+<!-- 地址与二维码 -->
+<div class="modal" id="addrModal" hidden>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2>访问地址</h2>
+      <button class="icon-btn small" data-close="addrModal" title="关闭">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+      </button>
+    </div>
+    <div class="modal-body addr-body">
+      <div class="qr-wrap"><img id="qrImg" alt="访问二维码" width="220" height="220"></div>
+      <p class="muted center">手机连同一个 Wi-Fi，扫码或输入下面地址</p>
+      <div class="addr-list" id="addrList"></div>
+      <p class="muted small-text" id="addrHint"></p>
+    </div>
+  </div>
+</div>
+
+<!-- 文本编辑 -->
+<div class="modal" id="editModal" hidden>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2>编辑文本</h2>
+      <button class="icon-btn small" data-close="editModal" title="关闭">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <textarea id="editInput" rows="8" class="edit-area"></textarea>
+      <div class="modal-foot">
+        <button class="ghost" data-close="editModal">取消</button>
+        <button class="primary" id="editSave">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 登录 -->
+<div class="login-mask" id="loginMask" hidden>
+  <form class="login-card" id="loginForm">
+    <div class="logo big" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="12" rx="2"></rect>
+        <path d="M8 20h8M12 16v4"></path>
+        <path d="M8 9.5h.01M8 12.5h.01M11 9.5h5M11 12.5h3"></path>
+      </svg>
+    </div>
+    <h2>需要访问密码</h2>
+    <p class="muted">请输入主机上 config.json 中配置的 PIN</p>
+    <input id="pinInput" type="password" inputmode="numeric" placeholder="访问密码" autocomplete="current-password" required>
+    <button class="primary wide" id="loginBtn" type="submit">进入</button>
+    <p class="error" id="loginError"></p>
+  </form>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+{
+  "name": "局域网共享",
+  "port": 8777,
+  "pin": "",
+  "storage": "storage",
+  "max_text_items": 300
+}
